@@ -1,9 +1,8 @@
 import logging
 from prometheus_client import start_http_server, Counter, Gauge
-from discord.ext import commands, tasks
-from discord import Interaction, InteractionType, AutoShardedClient
-from discord.app_commands.commands import Command
-from discord.ext.commands.bot import BotBase
+from disnake.ext import commands, tasks
+from disnake import Interaction, InteractionType, AutoShardedClient
+from disnake.ext.commands.bot import BotBase
 
 log = logging.getLogger("prometheus")
 
@@ -116,32 +115,32 @@ class PrometheusCog(commands.Cog):
         shard_id = ctx.guild.shard_id if ctx.guild else None
         ON_COMMAND_COUNTER.labels(shard_id, ctx.command.name).inc()
 
-    @commands.Cog.listener()
-    async def on_interaction(self, interaction: Interaction):
-        shard_id = interaction.guild.shard_id if interaction.guild else None
+    # @commands.Cog.listener()
+    # async def on_interaction(self, interaction: Interaction):
+    #     shard_id = interaction.guild.shard_id if interaction.guild else None
 
-        # command name can be None if comming from a view (like a button click) or a modal
-        command_name = None
-        if (
-            interaction.type == InteractionType.application_command
-            and interaction.command
-        ):
-            if isinstance(interaction.command, Command):
-                # Slash Command
-                command_name = ""
-                parent = interaction.command.parent
-                while parent is not None:
-                    # Handle subcommands
-                    command_name += parent.name + " "
-                    parent = parent.parent
-                command_name += interaction.command.name
-            else:
-                # Context Menu Button
-                command_name = interaction.command.name
+    #     # command name can be None if comming from a view (like a button click) or a modal
+    #     command_name = None
+    #     if (
+    #         interaction.type == InteractionType.application_command
+    #         and interaction.command
+    #     ):
+    #         if isinstance(interaction.command, Command):
+    #             # Slash Command
+    #             command_name = ""
+    #             parent = interaction.command.parent
+    #             while parent is not None:
+    #                 # Handle subcommands
+    #                 command_name += parent.name + " "
+    #                 parent = parent.parent
+    #             command_name += interaction.command.name
+    #         else:
+    #             # Context Menu Button
+    #             command_name = interaction.command.name
 
-        ON_INTERACTION_COUNTER.labels(
-            shard_id, interaction.type.name, command_name
-        ).inc()
+    #     ON_INTERACTION_COUNTER.labels(
+    #         shard_id, interaction.type.name, command_name
+    #     ).inc()
 
     @commands.Cog.listener()
     async def on_connect(self):
